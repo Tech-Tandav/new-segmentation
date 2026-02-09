@@ -34,6 +34,7 @@ ENV CHROMEDRIVER_PATH=/usr/bin/chromedriver
 EXPOSE 8000
 # Meaning: Prepare to serve the app on port 8000.
 
+
 # STEP 9: START COOKING
 CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
 # Meaning: The default way to start the kitchen.
