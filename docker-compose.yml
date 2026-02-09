@@ -13,7 +13,7 @@ services:
     # Set the working directory so it knows where manage.py is
     working_dir: /app
     ports:
-      - "8000:8000"
+      - "9292:8000"
     environment:
       - CELERY_BROKER_URL=redis://redis:6379/0
     depends_on:
