@@ -130,5 +130,3 @@ CELERY_TASK_SERIALIZER = "json"
 
 # enabling database scheduler
 CELERY_BEAT_SCHEDULER = "django_celery_beat.schedulers:DatabaseScheduler"
-
-AUTH_USER_MODEL = "news.User"
