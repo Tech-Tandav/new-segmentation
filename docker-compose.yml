@@ -1,45 +1,140 @@
+# services:
+#   redis:
+#     image: redis:alpine
+#     ports:
+#       - "6380:6379"
+
+#   web:
+#     build: .
+#     # Add 'sh -c' to ensure the command runs in a shell environment
+#     command: sh -c "python manage.py runserver 0.0.0.0:8000"
+#     volumes:
+#       - .:/app
+#     # Set the working directory so it knows where manage.py is
+#     working_dir: /app
+#     ports:
+#       - "9292:8000"
+#     environment:
+#       - CELERY_BROKER_URL=redis://redis:6379/0
+#     depends_on:
+#       - redis
+#     restart: always
+
+#   celery_worker:
+#     build: .
+#     command: celery -A santosh worker -l info
+#     volumes:
+#       - .:/app
+#     working_dir: /app
+#     environment:
+#       - CELERY_BROKER_URL=redis://redis:6379/0
+#     depends_on:
+#       - redis
+#     restart: always
+
+#   celery_beat:
+#     build: .
+#     command: celery -A santosh beat -l info
+#     volumes:
+#       - .:/app
+#     working_dir: /app
+#     environment:
+#       - CELERY_BROKER_URL=redis://redis:6379/0
+#     depends_on:
+#       - redis
+#     restart: always
+
+
+volumes:
+  new_segmentation_production_postgres_data: {}
+  new_segmentation_map_production_postgres_data_backups: {}
+  new_segmentation_map_production_django_media: {}
+  new_segmentation_map_production_django_staticfiles: {}
+  
+  new_segmentation_map_production_redis_data: {}
+  
+networks:
+  new_segmentation:
+
 services:
+  django: &django
+    build:
+      context: .
+      dockerfile: ./compose/production/django/Dockerfile
+
+    image: new_segmentation_production_django
+    volumes:
+      - new_segmentation_map_production_django_media:/app/new_segmentation/media
+    depends_on:
+      - postgres
+      - redis
+    env_file:
+      - ./.envs/.production/.django
+      - ./.envs/.production/.postgres
+    command: /start
+    networks:
+      - new_segmentation
+    restart: always
+
+  postgres:
+    build:
+      context: .
+      dockerfile: ./compose/production/postgres/Dockerfile
+    image: new_segmentation_production_postgres
+    volumes:
+      - new_segmentation_map_production_postgres_data:/var/lib/postgresql/data
+      - new_segmentation_map_production_postgres_data_backups:/backups
+    env_file:
+      - ./.envs/.production/.postgres
+    networks:
+      - new_segmentation
+    restart: always
+
   redis:
-    image: redis:alpine
-    ports:
-      - "6380:6379"
-
-  web:
-    build: .
-    # Add 'sh -c' to ensure the command runs in a shell environment
-    command: sh -c "python manage.py runserver 0.0.0.0:8000"
+    image: docker.io/redis:6
+    
     volumes:
-      - .:/app
-    # Set the working directory so it knows where manage.py is
-    working_dir: /app
-    ports:
-      - "9292:8000"
-    environment:
-      - CELERY_BROKER_URL=redis://redis:6379/0
-    depends_on:
-      - redis
+      - new_segmentation_map_production_redis_data:/data
+    
+    networks:
+      - new_segmentation
     restart: always
 
-  celery_worker:
-    build: .
-    command: celery -A santosh worker -l info
-    volumes:
-      - .:/app
-    working_dir: /app
-    environment:
-      - CELERY_BROKER_URL=redis://redis:6379/0
-    depends_on:
-      - redis
+  celeryworker:
+    <<: *django
+    image: new_segmentation_production_celeryworker
+    command: /start-celeryworker
+    networks:
+      - new_segmentation
     restart: always
 
-  celery_beat:
-    build: .
-    command: celery -A santosh beat -l info
-    volumes:
-      - .:/app
-    working_dir: /app
-    environment:
-      - CELERY_BROKER_URL=redis://redis:6379/0
+  celerybeat:
+    <<: *django
+    image: new_segmentation_production_celerybeat
+    command: /start-celerybeat
+    networks:
+      - new_segmentation
+    restart: always
+
+  flower:
+    <<: *django
+    image: new_segmentation_production_flower
+    command: /start-flower
+    networks:
+      - new_segmentation
+    restart: always
+
+  nginx:
+    build:
+      context: .
+      dockerfile: ./compose/production/nginx/Dockerfile
+    image: new_segmentation_production_nginx
     depends_on:
-      - redis
+      - django
+    volumes:
+      - new_segmentation_map_production_django_media:/app/media
+    ports:
+      - 9292:80
+    networks:
+      - new_segmentation
     restart: always
