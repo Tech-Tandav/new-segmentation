@@ -7,7 +7,7 @@ services:
   web:
     build: .
     # Add 'sh -c' to ensure the command runs in a shell environment
-    command: sh -c "python manage.py customcreatesuperuser"  "python manage.py runserver 0.0.0.0:8000"
+    command: sh -c "python manage.py runserver 0.0.0.0:8000"
     volumes:
       - .:/app
     # Set the working directory so it knows where manage.py is
