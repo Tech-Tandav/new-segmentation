@@ -82,8 +82,8 @@ services:
       dockerfile: ./compose/production/postgres/Dockerfile
     image: new_segmentation_production_postgres
     volumes:
-      - new_segmentation_map_production_postgres_data:/var/lib/postgresql/data
-      - new_segmentation_map_production_postgres_data_backups:/backups
+      - new_segmentation_production_postgres_data:/var/lib/postgresql/data
+      - new_segmentation_production_postgres_data_backups:/backups
     env_file:
       - ./.envs/.production/.postgres
     networks:
