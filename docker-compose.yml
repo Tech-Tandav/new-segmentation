@@ -9,7 +9,7 @@ services:
     # Add 'sh -c' to ensure the command runs in a shell environment
     command: sh -c "python manage.py runserver 0.0.0.0:8000"
     volumes:
-      - .:/app
+      - ./data:/app/data
     # Set the working directory so it knows where manage.py is
     working_dir: /app
     ports:
@@ -24,7 +24,7 @@ services:
     build: .
     command: celery -A santosh worker -l info
     volumes:
-      - .:/app
+      - ./data:/app/data
     working_dir: /app
     environment:
       - CELERY_BROKER_URL=redis://redis:6379/0
@@ -36,7 +36,7 @@ services:
     build: .
     command: celery -A santosh beat -l info
     volumes:
-      - .:/app
+      - ./data:/app/data
     working_dir: /app
     environment:
       - CELERY_BROKER_URL=redis://redis:6379/0
