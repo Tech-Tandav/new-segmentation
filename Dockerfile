@@ -31,10 +31,15 @@ ENV CHROMEDRIVER_PATH=/usr/bin/chromedriver
 # Meaning: Tell the chef exactly where the oven and gas line are located.
 
 # STEP 8: OPEN THE SERVICE WINDOW
-EXPOSE 8000
+
 # Meaning: Prepare to serve the app on port 8000.
 
+COPY entrypoint.sh /app/entrypoint.sh
+RUN chmod +x /app/entrypoint.sh   # <- make it executable
 
+EXPOSE 8000
+
+ENTRYPOINT ["/app/entrypoint.sh"]
 # STEP 9: START COOKING
 CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
 # Meaning: The default way to start the kitchen.

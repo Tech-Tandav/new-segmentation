@@ -15,7 +15,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         data = {'is_staff': True, 'is_superuser': True, 'is_active':True, "email":"default@gmail.com"}
-        user, _created = self.User.objects.update_or_create(username="username",
+        user, _created = self.User.objects.update_or_create(username="tree",
                                                             defaults=data)
-        user.set_password("password")
+        user.set_password("tree")
         user.save()
