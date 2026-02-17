@@ -19,7 +19,9 @@ RUN mkdir -p /app/data /app/data/uploads
 COPY entrypoint.sh /app/entrypoint.sh
 RUN chmod +x /app/entrypoint.sh   # <- make it executable
 
+# Collect static files
+RUN python manage.py collectstatic --noinput
 EXPOSE 8000
 
 ENTRYPOINT ["/app/entrypoint.sh"]
-CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+CMD ["sh", "-c", "python manage.py create_admin && python manage.py migrate --noinput && gunicorn --bind 0.0.0.0:8000 --workers 2 santosh.wsgi:application"]
