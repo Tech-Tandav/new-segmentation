@@ -24,4 +24,4 @@ RUN python manage.py collectstatic --noinput
 EXPOSE 8000
 
 ENTRYPOINT ["/app/entrypoint.sh"]
-CMD ["sh", "-c", "python manage.py create_admin && python manage.py migrate --noinput && gunicorn --bind 0.0.0.0:8000 --workers 2 santosh.wsgi:application"]
+CMD ["sh", "-c", " python manage.py migrate --noinput && gunicorn --bind 0.0.0.0:8000 --workers 2 santosh.wsgi:application"]
